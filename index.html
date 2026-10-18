@@ -56,6 +56,34 @@
         </div>
     </div>
 
+    <!-- Modal Verifikasi Poin oleh Admin -->
+    <div id="modal-verifikasi" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Verifikasi & Tetapkan Poin BK</h3>
+            <p class="text-xs text-slate-500 mb-4">Tinjau laporan dan tentukan besaran bobot poin karakter.</p>
+            <form onsubmit="prosesVerifikasi(event)" class="space-y-4">
+                <input type="hidden" id="verif-id-log">
+                <div class="bg-slate-50 p-3 rounded-xl text-xs space-y-1 border border-slate-200">
+                    <p><strong class="text-slate-700">Siswa:</strong> <span id="verif-nama-siswa">-</span></p>
+                    <p><strong class="text-slate-700">Catatan:</strong> <span id="verif-detail">-</span></p>
+                    <p><strong class="text-slate-700">Pelapor:</strong> <span id="verif-pelapor">-</span></p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Jumlah Poin (Bisa + atau -)</label>
+                    <input type="number" id="verif-poin" required placeholder="Contoh: -10 atau 15" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Nama Verifikator (BK / Admin)</label>
+                    <input type="text" id="verif-nama-admin" required placeholder="Contoh: Pak Rahmad (BK)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeVerifModal()" class="flex-1 bg-slate-100 text-slate-600 font-semibold py-2.5 rounded-xl text-xs">Batal</button>
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow-md">Simpan & Verifikasi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Main Container Layout -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
         
@@ -88,13 +116,13 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Kategori Sikap</label>
-                            <select id="kategori-sikap" onchange="updateOpsiKarakter()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none">
+                            <select id="kategori-sikap" onchange="renderOpsiKarakter()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none">
                                 <option value="Negatif">🔴 Karakter Negatif (Perlu Pembinaan)</option>
                                 <option value="Positif">🟢 Karakter Positif (Apresiasi)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Indikator Karakter</label>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Indikator Karakter (Dari Master Excel)</label>
                             <select id="select-karakter" onchange="cekKarakterKustom()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none"></select>
                         </div>
                     </div>
@@ -129,7 +157,7 @@
                     <p class="text-sm text-slate-300 leading-relaxed">Setiap jurnal karakter (termasuk karakter kustom) diteruskan ke BK / Waka Kesiswaan untuk dikonfirmasi dan ditentukan bobot poinnya.</p>
                 </div>
                 <div class="mt-8 pt-6 border-t border-slate-800 text-xs text-slate-400">
-                    <p>💡 Penilaian berfokus pada pembentukan kebiasaan baik dan pemantauan perkembangan karakter siswa.</p>
+                    <p>💡 Indikator sikap diambil secara otomatis dari Sheet <code class="text-amber-300 font-mono">Daftar_Positif</code> & <code class="text-amber-300 font-mono">Daftar_Negatif</code>.</p>
                 </div>
             </div>
         </section>
@@ -157,7 +185,7 @@
                             <th class="p-4">Indikator Karakter</th>
                             <th class="p-4">Pelapor</th>
                             <th class="p-4 text-center">Poin</th>
-                            <th class="p-4 text-center">Status BK</th>
+                            <th class="p-4 text-center">Status / Aksi BK</th>
                         </tr>
                     </thead>
                     <tbody id="table-rekap-body" class="text-sm divide-y divide-slate-100">
@@ -167,27 +195,61 @@
             </div>
         </section>
 
-        <!-- TAB 3: ADMIN & KELOLA DATABASE -->
-        <section id="tab-admin" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+        <!-- TAB 3: ADMIN & KELOLA DATABASE & TEMPLATE EXCEL -->
+        <section id="tab-admin" class="hidden space-y-8">
+            <!-- Section 1: Download Template Excel Format Standar -->
+            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-3xl p-8 shadow-md">
                 <div class="mb-6">
-                    <h2 class="text-lg font-bold text-slate-900">1. Upload Database Siswa</h2>
-                    <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">NIS</code>, <code class="text-indigo-600 font-mono">Nama_Siswa</code>, <code class="text-indigo-600 font-mono">Kelas</code></p>
+                    <span class="bg-indigo-500/30 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">Format Baku Sistem</span>
+                    <h2 class="text-xl font-bold mt-2">📥 Download Template Excel Khusus</h2>
+                    <p class="text-xs text-slate-300 mt-1">Unduh contoh format Excel di bawah ini agar data yang Anda upload sesuai dengan struktur kolom aplikasi Karakter360.</p>
                 </div>
-                <div class="space-y-4">
-                    <input type="file" id="excel-file-siswa" accept=".xlsx, .xls, .csv" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
-                    <button onclick="uploadExcelSiswa()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition text-xs shadow">Upload Data Siswa</button>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <button onclick="downloadTemplateExcel('siswa')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">📄</div>
+                        <p class="text-xs font-bold text-white">Template Siswa</p>
+                        <p class="text-[10px] text-slate-300 mt-0.5">NIS, Nama_Siswa, Kelas</p>
+                    </button>
+                    <button onclick="downloadTemplateExcel('guru')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">👨‍🏫</div>
+                        <p class="text-xs font-bold text-white">Template Guru</p>
+                        <p class="text-[10px] text-slate-300 mt-0.5">NIP, Nama_Guru, Jabatan</p>
+                    </button>
+                    <button onclick="downloadTemplateExcel('positif')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">🟢</div>
+                        <p class="text-xs font-bold text-white">Template Positif</p>
+                        <p class="text-[10px] text-slate-300 mt-0.5">Indikator, Poin</p>
+                    </button>
+                    <button onclick="downloadTemplateExcel('negatif')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">🔴</div>
+                        <p class="text-xs font-bold text-white">Template Negatif</p>
+                        <p class="text-[10px] text-slate-300 mt-0.5">Indikator, Poin</p>
+                    </button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                <div class="mb-6">
-                    <h2 class="text-lg font-bold text-slate-900">2. Upload Database Guru</h2>
-                    <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">Nama_Guru</code>, <code class="text-indigo-600 font-mono">NIP</code>, <code class="text-indigo-600 font-mono">Jabatan</code></p>
+            <!-- Section 2: Upload Panel Excel -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                    <div class="mb-6">
+                        <h2 class="text-lg font-bold text-slate-900">1. Upload Database Siswa</h2>
+                        <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">NIS</code>, <code class="text-indigo-600 font-mono">Nama_Siswa</code>, <code class="text-indigo-600 font-mono">Kelas</code></p>
+                    </div>
+                    <div class="space-y-4">
+                        <input type="file" id="excel-file-siswa" accept=".xlsx, .xls, .csv" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+                        <button onclick="uploadExcelSiswa()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition text-xs shadow">Upload Data Siswa</button>
+                    </div>
                 </div>
-                <div class="space-y-4">
-                    <input type="file" id="excel-file-guru" accept=".xlsx, .xls, .csv" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
-                    <button onclick="uploadExcelGuru()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition text-xs shadow">Upload Data Guru</button>
+
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                    <div class="mb-6">
+                        <h2 class="text-lg font-bold text-slate-900">2. Upload Database Guru</h2>
+                        <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">NIP</code>, <code class="text-indigo-600 font-mono">Nama_Guru</code>, <code class="text-indigo-600 font-mono">Jabatan</code></p>
+                    </div>
+                    <div class="space-y-4">
+                        <input type="file" id="excel-file-guru" accept=".xlsx, .xls, .csv" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+                        <button onclick="uploadExcelGuru()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition text-xs shadow">Upload Data Guru</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -204,26 +266,9 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyGF6Ri2sTiQP7GFEEbh6yLHGb07CIYQ4wPb-eI2_R3kXTeEQ4KIVBgOcKEDESZEQZN/exec";
         let isAdminLoggedIn = false;
 
-        const daftarKarakter = {
-            Negatif: [
-                "Keterlambatan Masuk Sekolah/KBM",
-                "Ketidakdisiplinan Seragam/Atribut",
-                "Perundungan (Bullying) / Verbal / Fisik",
-                "Penggunaan Gadget Tanpa Izin saat KBM",
-                "Membolos / Tinggal Kelas Tanpa Izin",
-                "Sikap Tidak Sopan Kepada Guru/Staf",
-                "Merusak Fasilitas Sekolah",
-                "➕ Lainnya (Tulis Karakter Kustom)"
-            ],
-            Positif: [
-                "Jujur & Berintegritas (Mengembalikan Barang Hilang, dll)",
-                "Gotong Royong & Empati Membantu Sesama",
-                "Disiplin & Tepat Waktu Konsisten",
-                "Inisiatif & Kepemimpinan di Kelas/Sekolah",
-                "Sopan Santun & Manner Sangat Baik",
-                "Menjaga Kebersihan & Kerapihan Lingkungan",
-                "➕ Lainnya (Tulis Karakter Kustom)"
-            ]
+        let masterKarakter = {
+            Positif: [],
+            Negatif: []
         };
 
         function toggleAdminLogin() {
@@ -255,20 +300,38 @@
                 document.getElementById('badge-lock').classList.add('hidden');
                 closeLoginModal();
                 alert("Login Admin Berhasil!");
+                loadRekapData();
             } else {
                 alert("Username atau Password Salah!");
             }
         }
 
-        function updateOpsiKarakter() {
+        function renderOpsiKarakter() {
             let kat = document.getElementById('kategori-sikap').value;
             let select = document.getElementById('select-karakter');
             select.innerHTML = "";
-            daftarKarakter[kat].forEach(item => {
+
+            let list = masterKarakter[kat] || [];
+            if(list.length === 0) {
                 let opt = document.createElement('option');
-                opt.value = item; opt.textContent = item;
+                opt.value = "➕ Lainnya (Tulis Karakter Kustom)";
+                opt.textContent = "➕ Lainnya (Tulis Karakter Kustom)";
                 select.appendChild(opt);
-            });
+            } else {
+                list.forEach(item => {
+                    let opt = document.createElement('option');
+                    let namaIndikator = item.Indikator || item.indikator || item;
+                    let poinText = item.Poin ? ` (${item.Poin > 0 ? '+' : ''}${item.Poin} poin)` : '';
+                    opt.value = namaIndikator;
+                    opt.textContent = `${namaIndikator}${poinText}`;
+                    opt.dataset.poin = item.Poin || 0;
+                    select.appendChild(opt);
+                });
+                let optKustom = document.createElement('option');
+                optKustom.value = "➕ Lainnya (Tulis Karakter Kustom)";
+                optKustom.textContent = "➕ Lainnya (Tulis Karakter Kustom)";
+                select.appendChild(optKustom);
+            }
             cekKarakterKustom();
         }
 
@@ -311,9 +374,14 @@
         }
 
         window.onload = function() {
-            updateOpsiKarakter();
-            
-            // Fetch Data Siswa
+            fetch(API_URL + "?action=GET_DAFTAR_POSITIF")
+                .then(res => res.json())
+                .then(data => { if(Array.isArray(data)) masterKarakter.Positif = data; renderOpsiKarakter(); });
+
+            fetch(API_URL + "?action=GET_DAFTAR_NEGATIF")
+                .then(res => res.json())
+                .then(data => { if(Array.isArray(data)) masterKarakter.Negatif = data; renderOpsiKarakter(); });
+
             fetch(API_URL + "?action=GET_SISWA")
                 .then(res => res.json())
                 .then(data => {
@@ -332,10 +400,8 @@
                             }
                         });
                     }
-                })
-                .catch(err => console.error("Gagal memuat siswa:", err));
+                });
 
-            // Fetch Data Guru (Mengakomodasi berbagai format kolom spreadsheet)
             fetch(API_URL + "?action=GET_GURU")
                 .then(res => res.json())
                 .then(data => {
@@ -343,7 +409,6 @@
                     selectGuru.innerHTML = '<option value="">-- Pilih Guru Pelapor --</option>';
                     if (Array.isArray(data)) {
                         data.forEach(guru => {
-                            // Mencari nama guru dari properti Nama_Guru atau Nama
                             let namaGuru = guru.Nama_Guru || guru.Nama || guru.NIP || "";
                             if (namaGuru && namaGuru !== "Nama_Guru") {
                                 let opt = document.createElement('option');
@@ -353,8 +418,7 @@
                             }
                         });
                     }
-                })
-                .catch(err => console.error("Gagal memuat guru:", err));
+                });
         };
 
         function submitPelanggaran(e) {
@@ -362,7 +426,12 @@
             let selectSiswa = document.getElementById('select-siswa');
             let selectedOpt = selectSiswa.options[selectSiswa.selectedIndex];
             let katSikap = document.getElementById('kategori-sikap').value;
-            let karakterPilihan = document.getElementById('select-karakter').value;
+            
+            let selectKarakter = document.getElementById('select-karakter');
+            let selectedKarakterOpt = selectKarakter.options[selectKarakter.selectedIndex];
+            let karakterPilihan = selectKarakter.value;
+            let defaultPoin = selectedKarakterOpt ? (selectedKarakterOpt.dataset.poin || 0) : 0;
+
             if (karakterPilihan.includes("Lainnya")) karakterPilihan = "[Kustom] " + document.getElementById('karakter-kustom').value;
             
             let ketTambahan = document.getElementById('detail-kejadian').value;
@@ -376,13 +445,83 @@
                     nama_siswa: selectedOpt.dataset.nama || "-",
                     kelas: selectedOpt.dataset.kelas || "-",
                     detail_pelanggaran: fullDetail,
-                    guru_pelapor: document.getElementById('select-guru').value
+                    guru_pelapor: document.getElementById('select-guru').value,
+                    poin_default: defaultPoin
                 })
             }).then(() => { 
                 alert("Jurnal karakter berhasil dikirim dan siap ditinjau BK!"); 
                 document.getElementById('form-pelanggaran').reset(); 
-                updateOpsiKarakter(); 
+                renderOpsiKarakter(); 
             }).catch(err => alert("Gagal mengirim jurnal."));
+        }
+
+        function loadRekapData() {
+            fetch(API_URL).then(res => res.json()).then(data => {
+                let tbody = document.getElementById('table-rekap-body');
+                tbody.innerHTML = "";
+                if (!Array.isArray(data) || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-slate-400">Belum ada catatan jurnal karakter.</td></tr>`;
+                    return;
+                }
+                data.forEach(row => {
+                    let tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50/80 transition";
+                    let isPos = row.Detail_Pelanggaran && row.Detail_Pelanggaran.includes('[POSITIF]');
+                    
+                    let statusHtml = "";
+                    if(row.Status === 'Verified') {
+                        statusHtml = `<span class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Verified</span>`;
+                    } else {
+                        if(isAdminLoggedIn) {
+                            statusHtml = `<button onclick="bukaModalVerif('${row.ID}', '${row.Nama_Siswa}', '${row.Detail_Pelanggaran}', '${row.Guru_Pelapor}', ${row.Poin || 0})" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-1 rounded-xl shadow transition">⚡ Verifikasi</button>`;
+                        } else {
+                            statusHtml = `<span class="px-3 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200">Pending</span>`;
+                        }
+                    }
+
+                    tr.innerHTML = `
+                        <td class="p-4 text-slate-500">${row.Tanggal_Jam ? row.Tanggal_Jam.substring(0, 10) : ''}</td>
+                        <td class="p-4 font-mono text-xs text-slate-600">${row.NIS || '-'}</td>
+                        <td class="p-4 font-semibold text-slate-900">${row.Nama_Siswa || '-'}</td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md font-medium">${row.Kelas || '-'}</span></td>
+                        <td class="p-4 text-slate-700 font-medium">${row.Detail_Pelanggaran || '-'}</td>
+                        <td class="p-4 text-slate-500">${row.Guru_Pelapor || '-'}</td>
+                        <td class="p-4 text-center font-bold ${isPos ? 'text-emerald-600':'text-rose-600'}">${row.Poin || 0}</td>
+                        <td class="p-4 text-center">${statusHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function bukaModalVerif(id, nama, detail, pelapor, defaultPoin) {
+            document.getElementById('verif-id-log').value = id;
+            document.getElementById('verif-nama-siswa').textContent = nama;
+            document.getElementById('verif-detail').textContent = detail;
+            document.getElementById('verif-pelapor').textContent = pelapor;
+            document.getElementById('verif-poin').value = defaultPoin;
+            document.getElementById('modal-verifikasi').classList.remove('hidden');
+        }
+
+        function closeVerifModal() { document.getElementById('modal-verifikasi').classList.add('hidden'); }
+
+        function prosesVerifikasi(e) {
+            e.preventDefault();
+            let payload = {
+                action: "VERIFIKASI_LAPORAN",
+                id_log: document.getElementById('verif-id-log').value,
+                poin: parseInt(document.getElementById('verif-poin').value),
+                nama_verifikator: document.getElementById('verif-nama-admin').value
+            };
+
+            fetch(API_URL, {
+                method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("Laporan berhasil diverifikasi!");
+                closeVerifModal();
+                loadRekapData();
+            }).catch(err => alert("Gagal memverifikasi."));
         }
 
         function uploadExcelSiswa() {
@@ -415,31 +554,41 @@
             reader.readAsArrayBuffer(fileInput);
         }
 
-        function loadRekapData() {
-            fetch(API_URL).then(res => res.json()).then(data => {
-                let tbody = document.getElementById('table-rekap-body');
-                tbody.innerHTML = "";
-                if (!Array.isArray(data) || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-slate-400">Belum ada catatan jurnal karakter.</td></tr>`;
-                    return;
-                }
-                data.forEach(row => {
-                    let tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50/80 transition";
-                    let isPos = row.Detail_Pelanggaran && row.Detail_Pelanggaran.includes('[POSITIF]');
-                    tr.innerHTML = `
-                        <td class="p-4 text-slate-500">${row.Tanggal_Jam ? row.Tanggal_Jam.substring(0, 10) : ''}</td>
-                        <td class="p-4 font-mono text-xs text-slate-600">${row.NIS || '-'}</td>
-                        <td class="p-4 font-semibold text-slate-900">${row.Nama_Siswa || '-'}</td>
-                        <td class="p-4"><span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md font-medium">${row.Kelas || '-'}</span></td>
-                        <td class="p-4 text-slate-700 font-medium">${row.Detail_Pelanggaran || '-'}</td>
-                        <td class="p-4 text-slate-500">${row.Guru_Pelapor || '-'}</td>
-                        <td class="p-4 text-center font-bold ${isPos ? 'text-emerald-600':'text-rose-600'}">${row.Poin || 0}</td>
-                        <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-semibold rounded-full ${row.Status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200':'bg-amber-50 text-amber-700 border border-amber-200'}">${row.Status || 'Pending'}</span></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            });
+        // Fitur Pembuat & Pengunduh Template Excel Otomatis untuk Admin
+        function downloadTemplateExcel(type) {
+            let sampleData = [];
+            let fileName = "";
+
+            if (type === 'siswa') {
+                sampleData = [
+                    { NIS: "1001", Nama_Siswa: "Ahmad Fauzi", Kelas: "X-A" },
+                    { NIS: "1002", Nama_Siswa: "Beti Nurjanah", Kelas: "X-B" }
+                ];
+                fileName = "Template_Data_Siswa_Karakter360.xlsx";
+            } else if (type === 'guru') {
+                sampleData = [
+                    { NIP: "19850101", Nama_Guru: "Pak Budi Santoso", Jabatan: "Guru Matematika" },
+                    { NIP: "19870202", Nama_Guru: "Bu Ani Wijaya", Jabatan: "Guru BK" }
+                ];
+                fileName = "Template_Data_Guru_Karakter360.xlsx";
+            } else if (type === 'positif') {
+                sampleData = [
+                    { Indikator: "Mengembalikan Barang Hilang", Poin: 10 },
+                    { Indikator: "Juara Lomba Tingkat Kab/Kota", Poin: 20 }
+                ];
+                fileName = "Template_Daftar_Positif_Karakter360.xlsx";
+            } else if (type === 'negatif') {
+                sampleData = [
+                    { Indikator: "Keterlambatan KBM", Poin: -5 },
+                    { Indikator: "Seragam Tidak Lengkap", Poin: -5 }
+                ];
+                fileName = "Template_Daftar_Negatif_Karakter360.xlsx";
+            }
+
+            let worksheet = XLSX.utils.json_to_sheet(sampleData);
+            let workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+            XLSX.writeFile(workbook, fileName);
         }
 
         function downloadExcelRekap() {
