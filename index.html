@@ -197,35 +197,16 @@
 
         <!-- TAB 3: ADMIN & KELOLA DATABASE & TEMPLATE EXCEL -->
         <section id="tab-admin" class="hidden space-y-8">
-            <!-- Section 1: Download Template Excel Format Standar -->
-            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-3xl p-8 shadow-md">
-                <div class="mb-6">
-                    <span class="bg-indigo-500/30 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">Format Baku Sistem</span>
-                    <h2 class="text-xl font-bold mt-2">📥 Download Template Excel Khusus</h2>
-                    <p class="text-xs text-slate-300 mt-1">Unduh contoh format Excel di bawah ini agar data yang Anda upload sesuai dengan struktur kolom aplikasi Karakter360.</p>
+            <!-- Section 1: Download Master Template Excel 1 File -->
+            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-3xl p-8 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                <div>
+                    <span class="bg-indigo-500/30 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">1 File Master Lengkap</span>
+                    <h2 class="text-xl font-bold mt-2">📥 Download Template Excel Master</h2>
+                    <p class="text-xs text-slate-300 mt-1 max-w-xl">Unduh 1 file Excel (*Workbook*) yang berisi 4 Sheet sekaligus (<code class="text-amber-300 font-mono">Data_Siswa</code>, <code class="text-amber-300 font-mono">Data_Guru</code>, <code class="text-amber-300 font-mono">Daftar_Positif</code>, dan <code class="text-amber-300 font-mono">Daftar_Negatif</code>) dengan struktur header baku.</p>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <button onclick="downloadTemplateExcel('siswa')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
-                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">📄</div>
-                        <p class="text-xs font-bold text-white">Template Siswa</p>
-                        <p class="text-[10px] text-slate-300 mt-0.5">NIS, Nama_Siswa, Kelas</p>
-                    </button>
-                    <button onclick="downloadTemplateExcel('guru')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
-                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">👨‍🏫</div>
-                        <p class="text-xs font-bold text-white">Template Guru</p>
-                        <p class="text-[10px] text-slate-300 mt-0.5">NIP, Nama_Guru, Jabatan</p>
-                    </button>
-                    <button onclick="downloadTemplateExcel('positif')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
-                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">🟢</div>
-                        <p class="text-xs font-bold text-white">Template Positif</p>
-                        <p class="text-[10px] text-slate-300 mt-0.5">Indikator, Poin</p>
-                    </button>
-                    <button onclick="downloadTemplateExcel('negatif')" class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-2xl text-left transition backdrop-blur-sm group">
-                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform">🔴</div>
-                        <p class="text-xs font-bold text-white">Template Negatif</p>
-                        <p class="text-[10px] text-slate-300 mt-0.5">Indikator, Poin</p>
-                    </button>
-                </div>
+                <button onclick="downloadMasterTemplateExcel()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-3.5 rounded-2xl transition shadow-lg flex items-center space-x-2 text-sm shrink-0">
+                    <span>📊 Download 1 File Excel Master</span>
+                </button>
             </div>
 
             <!-- Section 2: Upload Panel Excel -->
@@ -554,41 +535,43 @@
             reader.readAsArrayBuffer(fileInput);
         }
 
-        // Fitur Pembuat & Pengunduh Template Excel Otomatis untuk Admin
-        function downloadTemplateExcel(type) {
-            let sampleData = [];
-            let fileName = "";
-
-            if (type === 'siswa') {
-                sampleData = [
-                    { NIS: "1001", Nama_Siswa: "Ahmad Fauzi", Kelas: "X-A" },
-                    { NIS: "1002", Nama_Siswa: "Beti Nurjanah", Kelas: "X-B" }
-                ];
-                fileName = "Template_Data_Siswa_Karakter360.xlsx";
-            } else if (type === 'guru') {
-                sampleData = [
-                    { NIP: "19850101", Nama_Guru: "Pak Budi Santoso", Jabatan: "Guru Matematika" },
-                    { NIP: "19870202", Nama_Guru: "Bu Ani Wijaya", Jabatan: "Guru BK" }
-                ];
-                fileName = "Template_Data_Guru_Karakter360.xlsx";
-            } else if (type === 'positif') {
-                sampleData = [
-                    { Indikator: "Mengembalikan Barang Hilang", Poin: 10 },
-                    { Indikator: "Juara Lomba Tingkat Kab/Kota", Poin: 20 }
-                ];
-                fileName = "Template_Daftar_Positif_Karakter360.xlsx";
-            } else if (type === 'negatif') {
-                sampleData = [
-                    { Indikator: "Keterlambatan KBM", Poin: -5 },
-                    { Indikator: "Seragam Tidak Lengkap", Poin: -5 }
-                ];
-                fileName = "Template_Daftar_Negatif_Karakter360.xlsx";
-            }
-
-            let worksheet = XLSX.utils.json_to_sheet(sampleData);
+        // Fitur Pembuat & Pengunduh 1 File Excel Master
+        function downloadMasterTemplateExcel() {
             let workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-            XLSX.writeFile(workbook, fileName);
+
+            // 1. Data Siswa Sample
+            let dataSiswa = [
+                { NIS: "1001", Nama_Siswa: "Ahmad Fauzi", Kelas: "X-A" },
+                { NIS: "1002", Nama_Siswa: "Beti Nurjanah", Kelas: "X-B" }
+            ];
+            let sheetSiswa = XLSX.utils.json_to_sheet(dataSiswa);
+            XLSX.utils.book_append_sheet(workbook, sheetSiswa, "Data_Siswa");
+
+            // 2. Data Guru Sample
+            let dataGuru = [
+                { NIP: "19850101", Nama_Guru: "Pak Budi Santoso", Jabatan: "Guru Matematika" },
+                { NIP: "19870202", Nama_Guru: "Bu Ani Wijaya", Jabatan: "Guru BK" }
+            ];
+            let sheetGuru = XLSX.utils.json_to_sheet(dataGuru);
+            XLSX.utils.book_append_sheet(workbook, sheetGuru, "Data_Guru");
+
+            // 3. Daftar Positif Sample
+            let dataPositif = [
+                { Indikator: "Mengembalikan Barang Hilang", Poin: 10 },
+                { Indikator: "Juara Lomba Tingkat Kab/Kota", Poin: 20 }
+            ];
+            let sheetPositif = XLSX.utils.json_to_sheet(dataPositif);
+            XLSX.utils.book_append_sheet(workbook, sheetPositif, "Daftar_Positif");
+
+            // 4. Daftar Negatif Sample
+            let dataNegatif = [
+                { Indikator: "Keterlambatan KBM", Poin: -5 },
+                { Indikator: "Seragam Tidak Lengkap", Poin: -5 }
+            ];
+            let sheetNegatif = XLSX.utils.json_to_sheet(dataNegatif);
+            XLSX.utils.book_append_sheet(workbook, sheetNegatif, "Daftar_Negatif");
+
+            XLSX.writeFile(workbook, "Master_Database_Karakter360.xlsx");
         }
 
         function downloadExcelRekap() {
