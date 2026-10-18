@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DisiplinKu - Jurnal Pelanggaran Siswa</title>
+    <!-- Tailwind CSS untuk Desain Profesional & Elegan -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS untuk Membaca & Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Navbar Header -->
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide">📚 DisiplinKu <span class="text-xs bg-blue-700 px-2 py-1 rounded ml-2">Beta</span></h1>
+            <div id="user-info" class="text-sm">Halo, <span id="nama-guru" class="font-semibold">Guru Pengajar</span></div>
+        </div>
+    </header>
+
+    <!-- Navigasi Menu / Tab -->
+    <nav class="max-w-6xl mx-auto px-4 mt-6">
+        <div class="flex space-x-2 border-b border-gray-200 pb-2">
+            <button onclick="switchTab('catat')" id="btn-catat" class="px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600 transition">Catat Pelanggaran</button>
+            <button onclick="switchTab('progress')" id="btn-progress" class="px-4 py-2 font-medium text-gray-500 hover:text-blue-600 transition">Progress & Rekap</button>
+            <button onclick="switchTab('admin')" id="btn-admin" class="px-4 py-2 font-medium text-gray-500 hover:text-blue-600 transition">Admin / Upload Siswa</button>
+        </div>
+    </nav>
+
+    <!-- Konten Utama -->
+    <main class="max-w-6xl mx-auto px-4 py-6">
+
+        <!-- TAB 1: CATAT PELANGGARAN -->
+        <section id="tab-catat" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-xl mx-auto">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">📝 Form Catat Pelanggaran Siswa</h2>
+            <form id="form-pelanggaran" onsubmit="submitPelanggaran(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pilih / Cari Nama Siswa</label>
+                    <select id="select-siswa" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="">-- Memuat Data Siswa --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Detail / Bentuk Pelanggaran</label>
+                    <textarea id="detail-pelanggaran" rows="3" required placeholder="Contoh: Terlambat upacara 15 menit..." class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Guru Pelapor</label>
+                    <input type="text" id="guru-pelapor" required placeholder="Nama Anda & Jabatan (Cth: Pak Budi - Piket)" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-md">Kirim Laporan Pelanggaran</button>
+            </form>
+        </section>
+
+        <!-- TAB 2: PROGRESS & REKAP SISWA -->
+        <section id="tab-progress" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-900">📊 Progress & Rekap Poin Siswa</h2>
+                <button onclick="downloadExcelRekap()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition shadow">📥 Download Excel Rekap</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-sm">
+                            <th class="p-3 border-b">Tanggal</th>
+                            <th class="p-3 border-b">NIS</th>
+                            <th class="p-3 border-b">Nama Siswa</th>
+                            <th class="p-3 border-b">Kelas</th>
+                            <th class="p-3 border-b">Detail Pelanggaran</th>
+                            <th class="p-3 border-b">Pelapor</th>
+                            <th class="p-3 border-b text-center">Poin</th>
+                            <th class="p-3 border-b text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-rekap-body" class="text-sm">
+                        <tr><td colspan="8" class="text-center p-4 text-gray-500">Memuat data rekap...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB 3: ADMIN & UPLOAD DATA SISWA -->
+        <section id="tab-admin" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-xl mx-auto">
+            <h2 class="text-lg font-bold text-gray-900 mb-2">⚙️ Upload Database Siswa (Excel)</h2>
+            <p class="text-sm text-gray-500 mb-4">Unggah file Excel daftar siswa dengan kolom: <code class="bg-gray-100 px-1 py-0.5 rounded text-blue-600">NIS</code>, <code class="bg-gray-100 px-1 py-0.5 rounded text-blue-600">Nama_Siswa</code>, <code class="bg-gray-100 px-1 py-0.5 rounded text-blue-600">Kelas</code>.</p>
+            <div class="space-y-4">
+                <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" class="w-full border border-gray-300 rounded-lg p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                <button onclick="uploadExcelSiswa()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg transition shadow-md">Proses & Unggah ke Database</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Logika Penghubung -->
+    <script>
+        const API_URL = "URL_WEB_APP_APPS_SCRIPT_ANDA"; // Ganti dengan URL deployment Google Apps Script Anda
+
+        // Fungsi Navigasi Tab
+        function switchTab(tab) {
+            document.getElementById('tab-catat').classList.add('hidden');
+            document.getElementById('tab-progress').classList.add('hidden');
+            document.getElementById('tab-admin').classList.add('hidden');
+            
+            document.getElementById('btn-catat').className = "px-4 py-2 font-medium text-gray-500 hover:text-blue-600 transition border-b-2 border-transparent";
+            document.getElementById('btn-progress').className = "px-4 py-2 font-medium text-gray-500 hover:text-blue-600 transition border-b-2 border-transparent";
+            document.getElementById('btn-admin').className = "px-4 py-2 font-medium text-gray-500 hover:text-blue-600 transition border-b-2 border-transparent";
+
+            if (tab === 'catat') {
+                document.getElementById('tab-catat').classList.remove('hidden');
+                document.getElementById('btn-catat').className = "px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600 transition";
+            } else if (tab === 'progress') {
+                document.getElementById('tab-progress').classList.remove('hidden');
+                document.getElementById('btn-progress').className = "px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600 transition";
+                loadRekapData();
+            } else if (tab === 'admin') {
+                document.getElementById('tab-admin').classList.remove('hidden');
+                document.getElementById('btn-admin').className = "px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600 transition";
+            }
+        }
+
+        // Ambil Data Siswa saat halaman dimuat untuk pilihan Dropdown Form
+        window.onload = function() {
+            fetch(API_URL + "?action=GET_SISWA")
+                .then(res => res.json())
+                .then(data => {
+                    let select = document.getElementById('select-siswa');
+                    select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+                    data.forEach(siswa => {
+                        let opt = document.createElement('option');
+                        opt.value = siswa.NIS;
+                        opt.textContent = `${siswa.NIS} - ${siswa.Nama_Siswa} (${siswa.Kelas})`;
+                        opt.dataset.nama = siswa.Nama_Siswa;
+                        opt.dataset.kelas = siswa.Kelas;
+                        select.appendChild(opt);
+                    });
+                })
+                .catch(err => console.error("Gagal memuat siswa:", err));
+        };
+
+        // Kirim Catatan Pelanggaran
+        function submitPelanggaran(e) {
+            e.preventDefault();
+            let select = document.getElementById('select-siswa');
+            let selectedOpt = select.options[select.selectedIndex];
+            
+            let payload = {
+                action: "CATAT_PELANGGARAN",
+                nis: select.value,
+                nama_siswa: selectedOpt.dataset.nama,
+                kelas: selectedOpt.dataset.kelas,
+                detail_pelanggaran: document.getElementById('detail-pelanggaran').value,
+                guru_pelapor: document.getElementById('guru-pelapor').value
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("Laporan pelanggaran berhasil dikirim!");
+                document.getElementById('form-pelanggaran').reset();
+            }).catch(err => alert("Gagal mengirim laporan."));
+        }
+
+        // Muat Data Progress / Rekap
+        function loadRekapData() {
+            fetch(API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    let tbody = document.getElementById('table-rekap-body');
+                    tbody.innerHTML = "";
+                    if(data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-gray-500">Belum ada data pelanggaran.</td></tr>`;
+                        return;
+                    }
+                    data.forEach(row => {
+                        let tr = document.createElement('tr');
+                        tr.className = "border-b hover:bg-gray-50";
+                        tr.innerHTML = `
+                            <td class="p-3">${row.Tanggal_Jam ? row.Tanggal_Jam.substring(0, 10) : ''}</td>
+                            <td class="p-3">${row.NIS}</td>
+                            <td class="p-3 font-medium">${row.Nama_Siswa}</td>
+                            <td class="p-3">${row.Kelas}</td>
+                            <td class="p-3">${row.Detail_Pelanggaran}</td>
+                            <td class="p-3">${row.Guru_Pelapor}</td>
+                            <td class="p-3 text-center font-bold text-red-600">${row.Poin}</td>
+                            <td class="p-3 text-center"><span class="px-2 py-1 text-xs rounded-full ${row.Status === 'Verified' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${row.Status}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        // Upload Excel Siswa Massal
+        function uploadExcelSiswa() {
+            let fileInput = document.getElementById('excel-file').files[0];
+            if (!fileInput) { alert("Pilih file Excel dulu!"); return; }
+
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let data = new Uint8Array(e.target.result);
+                let workbook = XLSX.read(data, {type: 'array'});
+                let jsonSiswa = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+
+                fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "UPLOAD_SISWA_MASSAL", data_siswa: jsonSiswa })
+                }).then(() => {
+                    alert("Data siswa berhasil diunggah!");
+                    location.reload();
+                });
+            };
+            reader.readAsArrayBuffer(fileInput);
+        }
+
+        // Download Excel Rekap
+        function downloadExcelRekap() {
+            fetch(API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    let worksheet = XLSX.utils.json_to_sheet(data);
+                    let workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Pelanggaran");
+                    XLSX.writeFile(workbook, "Rekap_Pelanggaran_Siswa.xlsx");
+                });
+        }
+    </script>
+</body>
+</html>
