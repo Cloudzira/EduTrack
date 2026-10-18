@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karakter360 - Observasi Karakter Siswa</title>
+    <title>Karakter360 - Observasi Karakter & Sikap Siswa</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- SheetJS untuk Excel -->
+    <!-- SheetJS untuk Membaca & Export Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-                <div class="text-right">
+                <div class="text-right hidden sm:block">
                     <p class="text-xs font-semibold text-slate-900" id="user-role-label">Mode: Guru Umum</p>
                     <p class="text-[10px] text-slate-500" id="user-status-detail">Input Jurnal & Rekap</p>
                 </div>
@@ -69,12 +69,12 @@
             </button>
         </div>
 
-        <!-- TAB 1: FORM CATAT JURNAL -->
+        <!-- TAB 1: FORM CATAT JURNAL SIKAP -->
         <section id="tab-catat" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                 <div class="mb-6">
                     <h2 class="text-xl font-bold text-slate-900">Form Jurnal Observasi Karakter</h2>
-                    <p class="text-sm text-slate-500">Catat indikator karakter & sikap siswa secara langsung.</p>
+                    <p class="text-sm text-slate-500">Catat indikator karakter & sikap (positif maupun negatif) siswa secara langsung.</p>
                 </div>
 
                 <form id="form-pelanggaran" onsubmit="submitPelanggaran(event)" class="space-y-5">
@@ -100,8 +100,8 @@
                     </div>
 
                     <div id="wrapper-karakter-kustom" class="hidden">
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-2">➕ Tulis Karakter Kustom Baru</label>
-                        <input type="text" id="karakter-kustom" placeholder="Misal: Membantu merapikan sarana tanpa diminta..." class="w-full bg-indigo-50/50 border border-indigo-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-2">➕ Tulis Karakter / Sikap Kustom Baru</label>
+                        <input type="text" id="karakter-kustom" placeholder="Misal: Membantu merapikan lab komputer tanpa diminta..." class="w-full bg-indigo-50/50 border border-indigo-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -113,7 +113,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Catatan Tambahan (Opsional)</label>
-                            <input type="text" id="detail-kejadian" placeholder="Cth: Jam istirahat pertama" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <input type="text" id="detail-kejadian" placeholder="Cth: Terjadi saat jam istirahat pertama" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
 
@@ -124,9 +124,12 @@
             <!-- Info Sidebar Card -->
             <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-3xl p-8 flex flex-col justify-between shadow-xl">
                 <div>
-                    <span class="bg-indigo-500/30 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">Hak Akses Sistem</span>
-                    <h3 class="text-lg font-bold mt-4 mb-2">Verifikasi Poin oleh Admin</h3>
-                    <p class="text-sm text-slate-300 leading-relaxed">Guru pengajar dapat melaporkan catatan karakter. Penentuan nilai bobot poin dan manajemen data master siswa/guru dikelola oleh Admin BK/Waka Kesiswaan.</p>
+                    <span class="bg-indigo-500/30 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">Alur Penilaian BK</span>
+                    <h3 class="text-lg font-bold mt-4 mb-2">Validasi Poin Karakter</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Setiap jurnal karakter (termasuk karakter kustom) diteruskan ke BK / Waka Kesiswaan untuk dikonfirmasi dan ditentukan bobot poinnya.</p>
+                </div>
+                <div class="mt-8 pt-6 border-t border-slate-800 text-xs text-slate-400">
+                    <p>💡 Penilaian berfokus pada pembentukan kebiasaan baik dan pemantauan perkembangan karakter siswa.</p>
                 </div>
             </div>
         </section>
@@ -136,7 +139,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-slate-900">Rekapitulasi Jurnal Karakter Siswa</h2>
-                    <p class="text-sm text-slate-500">Histori catatan sikap dan akumulasi poin siswa.</p>
+                    <p class="text-sm text-slate-500">Pantau akumulasi poin dan histori catatan sikap seluruh siswa.</p>
                 </div>
                 <button onclick="downloadExcelRekap()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition shadow-md flex items-center space-x-2">
                     <span>📥 Download Rekap Excel</span>
@@ -164,9 +167,8 @@
             </div>
         </section>
 
-        <!-- TAB 3: ADMIN & KELOLA DATA SISWA/GURU -->
+        <!-- TAB 3: ADMIN & KELOLA DATABASE -->
         <section id="tab-admin" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Panel Upload Data Siswa -->
             <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                 <div class="mb-6">
                     <h2 class="text-lg font-bold text-slate-900">1. Upload Database Siswa</h2>
@@ -178,7 +180,6 @@
                 </div>
             </div>
 
-            <!-- Panel Upload Data Guru -->
             <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                 <div class="mb-6">
                     <h2 class="text-lg font-bold text-slate-900">2. Upload Database Guru</h2>
@@ -193,13 +194,36 @@
 
     </div>
 
+    <!-- Footer -->
+    <footer class="mt-auto py-6 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+        <p>Karakter360 &bull; Platform Observasi & Pengembangan Karakter Siswa</p>
+    </footer>
+
+    <!-- JavaScript Logika Penghubung -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyGF6Ri2sTiQP7GFEEbh6yLHGb07CIYQ4wPb-eI2_R3kXTeEQ4KIVBgOcKEDESZEQZN/exec";
         let isAdminLoggedIn = false;
 
         const daftarKarakter = {
-            Negatif: ["Keterlambatan Masuk Sekolah/KBM", "Ketidakdisiplinan Seragam/Atribut", "Perundungan (Bullying) / Verbal", "Penggunaan Gadget Tanpa Izin", "Membolos KBM", "Sikap Tidak Sopan Kepada Guru", "Merusak Fasilitas Sekolah", "➕ Lainnya (Tulis Karakter Kustom)"],
-            Positif: ["Jujur & Berintegritas", "Gotong Royong & Empati", "Disiplin & Tepat Waktu", "Inisiatif & Kepemimpinan", "Sopan Santun & Manner Sangat Baik", "Menjaga Kebersihan Lingkungan", "➕ Lainnya (Tulis Karakter Kustom)"]
+            Negatif: [
+                "Keterlambatan Masuk Sekolah/KBM",
+                "Ketidakdisiplinan Seragam/Atribut",
+                "Perundungan (Bullying) / Verbal / Fisik",
+                "Penggunaan Gadget Tanpa Izin saat KBM",
+                "Membolos / Tinggal Kelas Tanpa Izin",
+                "Sikap Tidak Sopan Kepada Guru/Staf",
+                "Merusak Fasilitas Sekolah",
+                "➕ Lainnya (Tulis Karakter Kustom)"
+            ],
+            Positif: [
+                "Jujur & Berintegritas (Mengembalikan Barang Hilang, dll)",
+                "Gotong Royong & Empati Membantu Sesama",
+                "Disiplin & Tepat Waktu Konsisten",
+                "Inisiatif & Kepemimpinan di Kelas/Sekolah",
+                "Sopan Santun & Manner Sangat Baik",
+                "Menjaga Kebersihan & Kerapihan Lingkungan",
+                "➕ Lainnya (Tulis Karakter Kustom)"
+            ]
         };
 
         function toggleAdminLogin() {
@@ -223,7 +247,6 @@
             let user = document.getElementById('login-user').value;
             let pass = document.getElementById('login-pass').value;
 
-            // Simple Auth Check (Dapat diganti Firebase)
             if(user === "admin" && pass === "admin123") {
                 isAdminLoggedIn = true;
                 document.getElementById('user-role-label').textContent = "Mode: Admin Sekolah";
@@ -270,39 +293,61 @@
             document.getElementById('tab-progress').classList.add('hidden');
             document.getElementById('tab-admin').classList.add('hidden');
 
-            if (tab === 'catat') document.getElementById('tab-catat').classList.remove('hidden');
-            else if (tab === 'progress') { document.getElementById('tab-progress').classList.remove('hidden'); loadRekapData(); }
-            else if (tab === 'admin') document.getElementById('tab-admin').classList.remove('hidden');
+            document.getElementById('btn-catat').className = "flex-1 py-2 text-sm font-medium rounded-xl transition text-slate-600 hover:text-slate-900";
+            document.getElementById('btn-progress').className = "flex-1 py-2 text-sm font-medium rounded-xl transition text-slate-600 hover:text-slate-900";
+            document.getElementById('btn-admin').className = "flex-1 py-2 text-sm font-medium rounded-xl transition text-slate-600 hover:text-slate-900 flex items-center justify-center space-x-1";
+
+            if (tab === 'catat') {
+                document.getElementById('tab-catat').classList.remove('hidden');
+                document.getElementById('btn-catat').className = "flex-1 py-2 text-sm font-semibold rounded-xl transition bg-white text-indigo-600 shadow-sm";
+            } else if (tab === 'progress') {
+                document.getElementById('tab-progress').classList.remove('hidden');
+                document.getElementById('btn-progress').className = "flex-1 py-2 text-sm font-semibold rounded-xl transition bg-white text-indigo-600 shadow-sm";
+                loadRekapData();
+            } else if (tab === 'admin') {
+                document.getElementById('tab-admin').classList.remove('hidden');
+                document.getElementById('btn-admin').className = "flex-1 py-2 text-sm font-semibold rounded-xl transition bg-white text-indigo-600 shadow-sm flex items-center justify-center space-x-1";
+            }
         }
 
         window.onload = function() {
             updateOpsiKarakter();
-            // Load Data Siswa
+            
+            // Fetch Data Siswa
             fetch(API_URL + "?action=GET_SISWA")
                 .then(res => res.json())
                 .then(data => {
                     let select = document.getElementById('select-siswa');
                     select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-                    data.forEach(siswa => {
-                        let opt = document.createElement('option');
-                        opt.value = siswa.NIS; opt.textContent = `${siswa.NIS} - ${siswa.Nama_Siswa} (${siswa.Kelas})`;
-                        opt.dataset.nama = siswa.Nama_Siswa; opt.dataset.kelas = siswa.Kelas;
-                        select.appendChild(opt);
-                    });
-                });
+                    if (Array.isArray(data)) {
+                        data.forEach(siswa => {
+                            let opt = document.createElement('option');
+                            opt.value = siswa.NIS; 
+                            opt.textContent = `${siswa.NIS} - ${siswa.Nama_Siswa} (${siswa.Kelas})`;
+                            opt.dataset.nama = siswa.Nama_Siswa; 
+                            opt.dataset.kelas = siswa.Kelas;
+                            select.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(err => console.error("Gagal memuat siswa:", err));
 
-            // Load Data Guru
+            // Fetch Data Guru
             fetch(API_URL + "?action=GET_GURU")
                 .then(res => res.json())
                 .then(data => {
                     let selectGuru = document.getElementById('select-guru');
                     selectGuru.innerHTML = '<option value="">-- Pilih Guru Pelapor --</option>';
-                    data.forEach(guru => {
-                        let opt = document.createElement('option');
-                        opt.value = guru.Nama_Guru; opt.textContent = `${guru.Nama_Guru} (${guru.Jabatan || 'Guru'})`;
-                        selectGuru.appendChild(opt);
-                    });
-                });
+                    if (Array.isArray(data)) {
+                        data.forEach(guru => {
+                            let opt = document.createElement('option');
+                            opt.value = guru.Nama_Guru; 
+                            opt.textContent = `${guru.Nama_Guru} (${guru.Jabatan || 'Guru'})`;
+                            selectGuru.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(err => console.error("Gagal memuat guru:", err));
         };
 
         function submitPelanggaran(e) {
@@ -313,7 +358,8 @@
             let karakterPilihan = document.getElementById('select-karakter').value;
             if (karakterPilihan.includes("Lainnya")) karakterPilihan = "[Kustom] " + document.getElementById('karakter-kustom').value;
             
-            let fullDetail = `[${katSikap.toUpperCase()}] ${karakterPilihan}` + (document.getElementById('detail-kejadian').value ? ` (${document.getElementById('detail-kejadian').value})` : '');
+            let ketTambahan = document.getElementById('detail-kejadian').value;
+            let fullDetail = `[${katSikap.toUpperCase()}] ${karakterPilihan}` + (ketTambahan ? ` (${ketTambahan})` : '');
 
             fetch(API_URL, {
                 method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
@@ -325,7 +371,11 @@
                     detail_pelanggaran: fullDetail,
                     guru_pelapor: document.getElementById('select-guru').value
                 })
-            }).then(() => { alert("Jurnal karakter berhasil dikirim!"); document.getElementById('form-pelanggaran').reset(); updateOpsiKarakter(); });
+            }).then(() => { 
+                alert("Jurnal karakter berhasil dikirim dan siap ditinjau BK!"); 
+                document.getElementById('form-pelanggaran').reset(); 
+                updateOpsiKarakter(); 
+            }).catch(err => alert("Gagal mengirim jurnal."));
         }
 
         function uploadExcelSiswa() {
@@ -362,18 +412,23 @@
             fetch(API_URL).then(res => res.json()).then(data => {
                 let tbody = document.getElementById('table-rekap-body');
                 tbody.innerHTML = "";
+                if (!Array.isArray(data) || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-slate-400">Belum ada catatan jurnal karakter.</td></tr>`;
+                    return;
+                }
                 data.forEach(row => {
                     let tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50/80 transition";
                     let isPos = row.Detail_Pelanggaran && row.Detail_Pelanggaran.includes('[POSITIF]');
                     tr.innerHTML = `
                         <td class="p-4 text-slate-500">${row.Tanggal_Jam ? row.Tanggal_Jam.substring(0, 10) : ''}</td>
-                        <td class="p-4 font-mono text-xs">${row.NIS}</td>
-                        <td class="p-4 font-semibold">${row.Nama_Siswa}</td>
-                        <td class="p-4">${row.Kelas}</td>
-                        <td class="p-4 font-medium">${row.Detail_Pelanggaran}</td>
+                        <td class="p-4 font-mono text-xs text-slate-600">${row.NIS}</td>
+                        <td class="p-4 font-semibold text-slate-900">${row.Nama_Siswa}</td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md font-medium">${row.Kelas}</span></td>
+                        <td class="p-4 text-slate-700 font-medium">${row.Detail_Pelanggaran}</td>
                         <td class="p-4 text-slate-500">${row.Guru_Pelapor}</td>
                         <td class="p-4 text-center font-bold ${isPos ? 'text-emerald-600':'text-rose-600'}">${row.Poin}</td>
-                        <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-semibold rounded-full ${row.Status === 'Verified' ? 'bg-emerald-50 text-emerald-700':'bg-amber-50 text-amber-700'}">${row.Status}</span></td>
+                        <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-semibold rounded-full ${row.Status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200':'bg-amber-50 text-amber-700 border border-amber-200'}">${row.Status}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
