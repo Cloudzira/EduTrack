@@ -108,7 +108,7 @@
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Nama Guru Pelapor</label>
                             <select id="select-guru" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none">
-                                <option value="">-- Pilih Guru Pelapor --</option>
+                                <option value="">-- Memuat Data Guru --</option>
                             </select>
                         </div>
                         <div>
@@ -183,7 +183,7 @@
             <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                 <div class="mb-6">
                     <h2 class="text-lg font-bold text-slate-900">2. Upload Database Guru</h2>
-                    <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">NIP</code>, <code class="text-indigo-600 font-mono">Nama_Guru</code>, <code class="text-indigo-600 font-mono">Jabatan</code></p>
+                    <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">Nama_Guru</code>, <code class="text-indigo-600 font-mono">NIP</code>, <code class="text-indigo-600 font-mono">Jabatan</code></p>
                 </div>
                 <div class="space-y-4">
                     <input type="file" id="excel-file-guru" accept=".xlsx, .xls, .csv" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
@@ -321,18 +321,21 @@
                     select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
                     if (Array.isArray(data)) {
                         data.forEach(siswa => {
-                            let opt = document.createElement('option');
-                            opt.value = siswa.NIS; 
-                            opt.textContent = `${siswa.NIS} - ${siswa.Nama_Siswa} (${siswa.Kelas})`;
-                            opt.dataset.nama = siswa.Nama_Siswa; 
-                            opt.dataset.kelas = siswa.Kelas;
-                            select.appendChild(opt);
+                            let namaSiswa = siswa.Nama_Siswa || siswa.Nama || "";
+                            if (namaSiswa) {
+                                let opt = document.createElement('option');
+                                opt.value = siswa.NIS || "-"; 
+                                opt.textContent = `${siswa.NIS || '-'} - ${namaSiswa} (${siswa.Kelas || '-'})`;
+                                opt.dataset.nama = namaSiswa; 
+                                opt.dataset.kelas = siswa.Kelas || "-";
+                                select.appendChild(opt);
+                            }
                         });
                     }
                 })
                 .catch(err => console.error("Gagal memuat siswa:", err));
 
-            // Fetch Data Guru
+            // Fetch Data Guru (Mengakomodasi berbagai format kolom spreadsheet)
             fetch(API_URL + "?action=GET_GURU")
                 .then(res => res.json())
                 .then(data => {
@@ -340,10 +343,14 @@
                     selectGuru.innerHTML = '<option value="">-- Pilih Guru Pelapor --</option>';
                     if (Array.isArray(data)) {
                         data.forEach(guru => {
-                            let opt = document.createElement('option');
-                            opt.value = guru.Nama_Guru; 
-                            opt.textContent = `${guru.Nama_Guru} (${guru.Jabatan || 'Guru'})`;
-                            selectGuru.appendChild(opt);
+                            // Mencari nama guru dari properti Nama_Guru atau Nama
+                            let namaGuru = guru.Nama_Guru || guru.Nama || guru.NIP || "";
+                            if (namaGuru && namaGuru !== "Nama_Guru") {
+                                let opt = document.createElement('option');
+                                opt.value = namaGuru; 
+                                opt.textContent = `${namaGuru} ${guru.Jabatan ? '(' + guru.Jabatan + ')' : ''}`;
+                                selectGuru.appendChild(opt);
+                            }
                         });
                     }
                 })
@@ -366,8 +373,8 @@
                 body: JSON.stringify({
                     action: "CATAT_PELANGGARAN",
                     nis: selectSiswa.value,
-                    nama_siswa: selectedOpt.dataset.nama,
-                    kelas: selectedOpt.dataset.kelas,
+                    nama_siswa: selectedOpt.dataset.nama || "-",
+                    kelas: selectedOpt.dataset.kelas || "-",
                     detail_pelanggaran: fullDetail,
                     guru_pelapor: document.getElementById('select-guru').value
                 })
@@ -422,13 +429,13 @@
                     let isPos = row.Detail_Pelanggaran && row.Detail_Pelanggaran.includes('[POSITIF]');
                     tr.innerHTML = `
                         <td class="p-4 text-slate-500">${row.Tanggal_Jam ? row.Tanggal_Jam.substring(0, 10) : ''}</td>
-                        <td class="p-4 font-mono text-xs text-slate-600">${row.NIS}</td>
-                        <td class="p-4 font-semibold text-slate-900">${row.Nama_Siswa}</td>
-                        <td class="p-4"><span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md font-medium">${row.Kelas}</span></td>
-                        <td class="p-4 text-slate-700 font-medium">${row.Detail_Pelanggaran}</td>
-                        <td class="p-4 text-slate-500">${row.Guru_Pelapor}</td>
-                        <td class="p-4 text-center font-bold ${isPos ? 'text-emerald-600':'text-rose-600'}">${row.Poin}</td>
-                        <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-semibold rounded-full ${row.Status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200':'bg-amber-50 text-amber-700 border border-amber-200'}">${row.Status}</span></td>
+                        <td class="p-4 font-mono text-xs text-slate-600">${row.NIS || '-'}</td>
+                        <td class="p-4 font-semibold text-slate-900">${row.Nama_Siswa || '-'}</td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md font-medium">${row.Kelas || '-'}</span></td>
+                        <td class="p-4 text-slate-700 font-medium">${row.Detail_Pelanggaran || '-'}</td>
+                        <td class="p-4 text-slate-500">${row.Guru_Pelapor || '-'}</td>
+                        <td class="p-4 text-center font-bold ${isPos ? 'text-emerald-600':'text-rose-600'}">${row.Poin || 0}</td>
+                        <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-semibold rounded-full ${row.Status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200':'bg-amber-50 text-amber-700 border border-amber-200'}">${row.Status || 'Pending'}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
