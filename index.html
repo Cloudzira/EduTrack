@@ -29,7 +29,7 @@
                     <p class="text-xs font-semibold text-slate-900" id="user-role-label">Mode: Guru Umum</p>
                     <p class="text-[10px] text-slate-500" id="user-status-detail">Input Jurnal & Rekap</p>
                 </div>
-                <button id="btn-login-logout" onclick="toggleAdminLogin()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow">🔑 Login Admin</button>
+                <button id="btn-login-logout" onclick="toggleAdminLogin()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow">🔑 Login Admin</button>
             </div>
         </div>
     </header>
@@ -195,41 +195,38 @@
             </div>
         </section>
 
-        <!-- TAB 3: ADMIN & KELOLA DATABASE & TEMPLATE EXCEL -->
-        <section id="tab-admin" class="hidden space-y-8">
-            <!-- Section 1: Download Master Template Excel 1 File -->
-            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-3xl p-8 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                <div>
-                    <span class="bg-indigo-500/30 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">1 File Master Lengkap</span>
-                    <h2 class="text-xl font-bold mt-2">📥 Download Template Excel Master</h2>
-                    <p class="text-xs text-slate-300 mt-1 max-w-xl">Unduh 1 file Excel (*Workbook*) yang berisi 4 Sheet sekaligus (<code class="text-amber-300 font-mono">Data_Siswa</code>, <code class="text-amber-300 font-mono">Data_Guru</code>, <code class="text-amber-300 font-mono">Daftar_Positif</code>, dan <code class="text-amber-300 font-mono">Daftar_Negatif</code>) dengan struktur header baku.</p>
-                </div>
-                <button onclick="downloadMasterTemplateExcel()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-3.5 rounded-2xl transition shadow-lg flex items-center space-x-2 text-sm shrink-0">
-                    <span>📊 Download 1 File Excel Master</span>
-                </button>
+        <!-- TAB 3: ADMIN & KELOLA MASTER DATABASE EXCEL (TAMPILAN BARU SANGAT RAPI) -->
+        <section id="tab-admin" class="hidden max-w-4xl mx-auto space-y-8">
+            <!-- Header Kartu Utama -->
+            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-3xl p-8 shadow-lg">
+                <span class="bg-indigo-500/30 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">Pusat Database Sekolah</span>
+                <h2 class="text-2xl font-bold mt-3">⚙️ Pengelolaan Master Database Excel</h2>
+                <p class="text-xs text-slate-300 mt-1 leading-relaxed">Kelola seluruh data sekolah (Siswa, Guru, Indikator Karakter Positif & Negatif) cukup dengan **1 File Master Excel** yang terintegrasi secara otomatis.</p>
             </div>
 
-            <!-- Section 2: Upload Panel Excel -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                    <div class="mb-6">
-                        <h2 class="text-lg font-bold text-slate-900">1. Upload Database Siswa</h2>
-                        <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">NIS</code>, <code class="text-indigo-600 font-mono">Nama_Siswa</code>, <code class="text-indigo-600 font-mono">Kelas</code></p>
+                <!-- Langkah 1: Unduh Master Excel -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-bold text-lg mb-4">1</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Download Template Master</h3>
+                        <p class="text-xs text-slate-500 mb-6">Dapatkan 1 file Excel (*Workbook*) berformat profesional dengan 4 sheet baku di dalamnya.</p>
                     </div>
-                    <div class="space-y-4">
-                        <input type="file" id="excel-file-siswa" accept=".xlsx, .xls, .csv" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
-                        <button onclick="uploadExcelSiswa()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition text-xs shadow">Upload Data Siswa</button>
-                    </div>
+                    <button onclick="downloadMasterTemplateExcel()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl transition shadow-md shadow-emerald-100 text-sm flex items-center justify-center space-x-2">
+                        <span>📊 Download 1 File Master Excel</span>
+                    </button>
                 </div>
 
-                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                    <div class="mb-6">
-                        <h2 class="text-lg font-bold text-slate-900">2. Upload Database Guru</h2>
-                        <p class="text-xs text-slate-500">Kolom Excel: <code class="text-indigo-600 font-mono">NIP</code>, <code class="text-indigo-600 font-mono">Nama_Guru</code>, <code class="text-indigo-600 font-mono">Jabatan</code></p>
+                <!-- Langkah 2: Upload Master Excel (Satu Pintu Upload) -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-bold text-lg mb-4">2</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Upload & Sinkronkan Excel</h3>
+                        <p class="text-xs text-slate-500 mb-4">Unggah file Master Excel yang sudah diisi. Sistem akan langsung meng-update database Google Spreadsheet Anda.</p>
                     </div>
                     <div class="space-y-4">
-                        <input type="file" id="excel-file-guru" accept=".xlsx, .xls, .csv" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
-                        <button onclick="uploadExcelGuru()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition text-xs shadow">Upload Data Guru</button>
+                        <input type="file" id="excel-file-master" accept=".xlsx, .xls" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 cursor-pointer">
+                        <button onclick="uploadMasterExcel()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow-md">Proses & Sync Semua Database</button>
                     </div>
                 </div>
             </div>
@@ -505,70 +502,76 @@
             }).catch(err => alert("Gagal memverifikasi."));
         }
 
-        function uploadExcelSiswa() {
-            let fileInput = document.getElementById('excel-file-siswa').files[0];
-            if (!fileInput) return alert("Pilih file Excel Siswa!");
+        // Single Master Excel Upload Handler
+        function uploadMasterExcel() {
+            let fileInput = document.getElementById('excel-file-master').files[0];
+            if (!fileInput) return alert("Pilih file Excel Master terlebih dahulu!");
+            
             let reader = new FileReader();
             reader.onload = function(e) {
                 let workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                let jsonSiswa = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                
+                let payload = {
+                    action: "UPLOAD_MASTER_EXCEL",
+                    data_siswa: workbook.Sheets["Data_Siswa"] ? XLSX.utils.sheet_to_json(workbook.Sheets["Data_Siswa"]) : [],
+                    data_guru: workbook.Sheets["Data_Guru"] ? XLSX.utils.sheet_to_json(workbook.Sheets["Data_Guru"]) : [],
+                    daftar_positif: workbook.Sheets["Daftar_Positif"] ? XLSX.utils.sheet_to_json(workbook.Sheets["Daftar_Positif"]) : [],
+                    daftar_negatif: workbook.Sheets["Daftar_Negatif"] ? XLSX.utils.sheet_to_json(workbook.Sheets["Daftar_Negatif"]) : []
+                };
+
                 fetch(API_URL, {
                     method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "UPLOAD_SISWA_MASSAL", data_siswa: jsonSiswa })
-                }).then(() => { alert("Data siswa berhasil diunggah!"); location.reload(); });
+                    body: JSON.stringify(payload)
+                }).then(() => { 
+                    alert("Sinkronisasi Master Excel berhasil! Seluruh database telah diperbarui."); 
+                    location.reload(); 
+                }).catch(err => alert("Gagal mengunggah Master Excel."));
             };
             reader.readAsArrayBuffer(fileInput);
         }
 
-        function uploadExcelGuru() {
-            let fileInput = document.getElementById('excel-file-guru').files[0];
-            if (!fileInput) return alert("Pilih file Excel Guru!");
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                let workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                let jsonGuru = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                fetch(API_URL, {
-                    method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "UPLOAD_GURU_MASSAL", data_guru: jsonGuru })
-                }).then(() => { alert("Data guru berhasil diunggah!"); location.reload(); });
-            };
-            reader.readAsArrayBuffer(fileInput);
-        }
-
-        // Fitur Pembuat & Pengunduh 1 File Excel Master
+        // Generator Template Master Excel dengan Auto Column Width
         function downloadMasterTemplateExcel() {
             let workbook = XLSX.utils.book_new();
 
-            // 1. Data Siswa Sample
+            // 1. Sheet Data Siswa
             let dataSiswa = [
                 { NIS: "1001", Nama_Siswa: "Ahmad Fauzi", Kelas: "X-A" },
-                { NIS: "1002", Nama_Siswa: "Beti Nurjanah", Kelas: "X-B" }
+                { NIS: "1002", Nama_Siswa: "Beti Nurjanah", Kelas: "X-B" },
+                { NIS: "1003", Nama_Siswa: "Candra Wijaya", Kelas: "XI-IPA-1" }
             ];
             let sheetSiswa = XLSX.utils.json_to_sheet(dataSiswa);
+            sheetSiswa['!cols'] = [{ wch: 15 }, { wch: 30 }, { wch: 15 }];
             XLSX.utils.book_append_sheet(workbook, sheetSiswa, "Data_Siswa");
 
-            // 2. Data Guru Sample
+            // 2. Sheet Data Guru
             let dataGuru = [
                 { NIP: "19850101", Nama_Guru: "Pak Budi Santoso", Jabatan: "Guru Matematika" },
-                { NIP: "19870202", Nama_Guru: "Bu Ani Wijaya", Jabatan: "Guru BK" }
+                { NIP: "19870202", Nama_Guru: "Bu Ani Wijaya", Jabatan: "Guru BK" },
+                { NIP: "19900303", Nama_Guru: "Pak Dedi Kurniawan", Jabatan: "Waka Kesiswaan" }
             ];
             let sheetGuru = XLSX.utils.json_to_sheet(dataGuru);
+            sheetGuru['!cols'] = [{ wch: 20 }, { wch: 30 }, { wch: 25 }];
             XLSX.utils.book_append_sheet(workbook, sheetGuru, "Data_Guru");
 
-            // 3. Daftar Positif Sample
+            // 3. Sheet Daftar Positif
             let dataPositif = [
-                { Indikator: "Mengembalikan Barang Hilang", Poin: 10 },
-                { Indikator: "Juara Lomba Tingkat Kab/Kota", Poin: 20 }
+                { Indikator: "Jujur & Berintegritas (Mengembalikan Barang Hilang)", Poin: 10 },
+                { Indikator: "Gotong Royong & Empati Membantu Sesama", Poin: 10 },
+                { Indikator: "Juara Lomba Tingkat Kabupaten/Kota", Poin: 20 }
             ];
             let sheetPositif = XLSX.utils.json_to_sheet(dataPositif);
+            sheetPositif['!cols'] = [{ wch: 55 }, { wch: 12 }];
             XLSX.utils.book_append_sheet(workbook, sheetPositif, "Daftar_Positif");
 
-            // 4. Daftar Negatif Sample
+            // 4. Sheet Daftar Negatif
             let dataNegatif = [
-                { Indikator: "Keterlambatan KBM", Poin: -5 },
-                { Indikator: "Seragam Tidak Lengkap", Poin: -5 }
+                { Indikator: "Keterlambatan Masuk KBM", Poin: -5 },
+                { Indikator: "Ketidakdisiplinan Seragam/Atribut", Poin: -5 },
+                { Indikator: "Perundungan (Bullying) / Verbal / Fisik", Poin: -20 }
             ];
             let sheetNegatif = XLSX.utils.json_to_sheet(dataNegatif);
+            sheetNegatif['!cols'] = [{ wch: 55 }, { wch: 12 }];
             XLSX.utils.book_append_sheet(workbook, sheetNegatif, "Daftar_Negatif");
 
             XLSX.writeFile(workbook, "Master_Database_Karakter360.xlsx");
